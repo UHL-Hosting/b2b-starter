@@ -21,6 +21,7 @@ medusaIntegrationTestRunner({
   inApp: true,
   env: {
     JWT_SECRET: "supersecret",
+    COOKIE_SECRET: "supersecret",
   },
   testSuite: ({ api, getContainer }) => {
     let storeHeaders, cart, product, salesChannel, region, customerToken;
