@@ -87,6 +87,14 @@ cp apps/backend/.env.template apps/backend/.env
 DATABASE_URL=postgres://postgres:@localhost:5432/medusa-b2b-starter
 ```
 
+   Set `JWT_SECRET` and `COOKIE_SECRET` in `apps/backend/.env` to unique random values (the backend will not start without them):
+
+```bash
+# Generate each value with: openssl rand -base64 32
+JWT_SECRET=<random value>
+COOKIE_SECRET=<random value>
+```
+
 4. Run migrations:
 
 ```bash
