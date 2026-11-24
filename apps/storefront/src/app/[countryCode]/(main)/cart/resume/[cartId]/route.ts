@@ -15,18 +15,25 @@ export async function GET(
 ) {
   const { countryCode, cartId } = await params
 
-  try {
-    const { cart } = await sdk.store.cart.retrieve(cartId, {
-      fields: "id,completed_at,metadata",
-    })
-    if (cart.completed_at || cart.metadata?.ucp_canceled === true) {
-      throw new Error("Cart is no longer open")
-    }
-  } catch {
+  const cart = await sdk.store.cart
+    .retrieve(cartId, { fields: "id,completed_at,metadata" })
+    .then(({ cart }) => cart)
+    .catch(() => null)
+
+  if (!cart || cart.completed_at || cart.metadata?.ucp_canceled === true) {
     return new NextResponse("This cart link has expired", {
       status: 410,
       headers: NO_STORE,
     })
+  }
+
+  try {
+    await sdk.store.cart.update(cartId, {
+      metadata: { ...cart.metadata, ucp_handed_off: true },
+    })
+  } catch {
+    // Never block the buyer's redirect on the handoff stamp; a cart bound to a
+    // customer account is already cut off from UCP via `customer_id`.
   }
 
   await activateCart(cartId)
