@@ -26,7 +26,7 @@ const ensureApprovalType = async (
     data: [approval],
   } = await query.graph({
     entity: "approval",
-    fields: ["type"],
+    fields: ["type", "cart_id"],
     filters: { id },
   });
 
@@ -38,6 +38,29 @@ const ensureApprovalType = async (
   const approvalType = approval.type as unknown as ApprovalType;
 
   if (approvalType !== ApprovalType.ADMIN) {
+    res.status(403).json({ message: "Forbidden" });
+    return;
+  }
+
+  const {
+    data: [customer],
+  } = await query.graph({
+    entity: "customer",
+    fields: ["employee.company.id"],
+    filters: { id: req.auth_context.actor_id },
+  });
+
+  const companyId = customer?.employee?.company?.id;
+
+  const {
+    data: [cart],
+  } = await query.graph({
+    entity: "cart",
+    fields: ["company.id"],
+    filters: { id: approval.cart_id },
+  });
+
+  if (!companyId || cart?.company?.id !== companyId) {
     res.status(403).json({ message: "Forbidden" });
     return;
   }
