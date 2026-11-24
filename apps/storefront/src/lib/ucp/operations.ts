@@ -34,6 +34,7 @@ const MAX_SEARCH_LIMIT = 50
 const MAX_LOOKUP_IDS = 50
 const IDEMPOTENCY_TTL_MS = 10 * 60 * 1000
 const CANCELED_KEY = "ucp_canceled"
+const HANDED_OFF_KEY = "ucp_handed_off"
 
 const asObject = (value: unknown): Input =>
   value && typeof value === "object" && !Array.isArray(value)
@@ -258,12 +259,15 @@ export const lookupCatalog = async (
 
 // Cart
 
+const isTakenOver = (cart: HttpTypes.StoreCart) =>
+  !!cart.customer_id || cart.metadata?.[HANDED_OFF_KEY] === true
+
 const retrieveCart = async (cartId: string) => {
   try {
     const { cart } = await sdk.store.cart.retrieve(cartId, {
       fields: UCP_CART_FIELDS,
     })
-    return cart
+    return cart && !isTakenOver(cart) ? cart : null
   } catch {
     return null
   }

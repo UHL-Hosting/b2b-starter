@@ -34,7 +34,7 @@ export const UCP_PRODUCT_FIELDS =
   "id,title,handle,description,thumbnail,*images,*options,*variants,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.calculated_price,*variants.options"
 
 export const UCP_CART_FIELDS =
-  "id,email,currency_code,region_id,completed_at,metadata,*items,+items.subtotal,+items.total,item_subtotal,discount_total,shipping_total,tax_total,total,*region.countries,*shipping_address"
+  "id,email,customer_id,currency_code,region_id,completed_at,metadata,*items,+items.subtotal,+items.total,item_subtotal,discount_total,shipping_total,tax_total,total,*region.countries,*shipping_address"
 
 const minorUnitDigits = (currency: string) =>
   new Intl.NumberFormat("en", { style: "currency", currency }).resolvedOptions()
